@@ -7,7 +7,7 @@ const TodoList = () => {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImplcnJ5IiwidXNlcklkIjoiNjFiY2YyYzU4YTdjZTU1NjMwY2JjMTcyIiwicm9sZSI6WyJ1c2VyIiwiYWRtaW4iXSwiaWF0IjoxNjM5Nzc3NzYwLCJleHAiOjE2Mzk3ODEzNjB9.M97r_hQWXOeJw-NsEt-1qYFf_fEmhst71k2RYGy9UbU`,
+					Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImplcnJ5IiwidXNlcklkIjoiNjFiY2YyYzU4YTdjZTU1NjMwY2JjMTcyIiwicm9sZSI6WyJ1c2VyIiwiYWRtaW4iXSwiaWF0IjoxNjM5Nzg0NTE3LCJleHAiOjE2Mzk3ODgxMTd9.3AkXsJuHrzNRsz_ywwzoBe3FcAwJJr5x23xTbHkviLM`,
 				},
 			});
 			const d = await resp.json();
@@ -133,11 +133,33 @@ const TodoList = () => {
 		}
 	};
 
+	const handleUpdate = async (index) => {
+		const data = {
+			from: newItem["from"],
+			to: newItem["to"],
+			content: newItem["content"],
+			creator: "61bcf2c58a7ce55630cbc172",
+		};
+		const updatedTodo = todos[index];
+		try {
+			fetch(`http://localhost:4000/api/event/${updatedTodo["_id"]}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify(data),
+			});
+		} catch (error) {
+			console.log(error);
+		}
+		changeAction();
+	};
+
 	return (
 		<div>
 			<button onClick={() => handleSignUp()}>Sign Up</button>
 			<button onClick={() => handleSignIn()}>Login</button>
-			{/* <button onClick={() => handleAdd(!newEvent)}>Add</button> */}
 			<button onClick={() => setNewEvent(!newEvent)}>Add Event</button>
 			{newEvent ? (
 				<ul>
@@ -190,7 +212,7 @@ const TodoList = () => {
 									type="text"
 									value={todo.isCompleted}
 								/>
-								<button onClick={changeAction}>Save</button>
+								<button onClick={() => handleUpdate(index)}>Save</button>
 								<button onClick={() => handleDelete(index)}>Delete</button>
 							</div>
 						)}
