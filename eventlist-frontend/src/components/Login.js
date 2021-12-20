@@ -34,7 +34,12 @@ const loginHandler = async (user, pwd) => {
 
 		const d = await resp.json();
 		console.log(d);
-		localStorage.setItem(user, d.data.token);
+		//store user credentials into localstorage
+		const userInfo = {
+			token: d.data.token,
+			id: d.data.userId
+		}
+		localStorage.setItem(user, JSON.stringify(userInfo));
 		return success;
 	} catch (error) {
 		console.log(error);

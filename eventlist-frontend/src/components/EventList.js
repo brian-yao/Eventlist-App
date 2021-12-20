@@ -1,92 +1,51 @@
 import React, { useState, useEffect } from "react";
 
-const EventList = ({location}) => {
+const EventList = ({ location }) => {
 	useEffect(() => {
-		const userToken = localStorage.getItem(location.state.username);
-		setToken(userToken);
+		const userInfo = JSON.parse(localStorage.getItem(location.state.username));
+		console.log(userInfo);
+		setToken(userInfo.token);
+		setUserId(userInfo.id);
 		const getEvents = async () => {
 			const resp = await fetch("http://localhost:4000/api/event", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${userToken}`,
+					Authorization: `Bearer ${userInfo.token}`,
 				},
 			});
 			const d = await resp.json();
 			console.log(d);
 
-			setTodos(d.result);
+			setEvents(d.result);
 		};
 
 		getEvents();
 	}, []);
-	const [todos, setTodos] = useState([]);
+	const [events, setEvents] = useState([]);
 	const [canEdit, setCanEdit] = useState(true);
-	const [newEvent, setNewEvent] = useState(false);
+	const [editNewEvent, setEditNewEvent] = useState(false);
 	const [newItem, setNewItem] = useState({});
+	//user auth
 	const [token, setToken] = useState(undefined);
+	const [userId, setUserId] = useState(undefined);
 
 	const changeAction = () => {
 		setCanEdit(!canEdit);
 	};
 
 	const changeInput = (index, col, e) => {
-		const newTodo = todos;
-		newTodo[index][col] = e.target.value;
-		setTodos([...newTodo]);
+		const newEvent = events;
+		newEvent[index][col] = e.target.value;
+		setEvents([...newEvent]);
 	};
 
 	const changeNewItemInput = (col, e) => {
-		const newNewtItem = newItem;
-		newNewtItem[col] = e.target.value;
-		setNewItem(newNewtItem);
+		const newNewItem = newItem;
+		newNewItem[col] = e.target.value;
+		setNewItem(newNewItem);
 	};
 
-	const handleSignUp = async () => {
-		const data = {
-			username: "jerry",
-			password: "123456",
-			isAdmin: true,
-		};
-
-		try {
-			const resp = await fetch("http://localhost:4000/api/user/signup", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data),
-			});
-
-			const d = await resp.json();
-			console.log(d);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const handleSignIn = async () => {
-		const data = {
-			username: "jerry",
-			password: "123456",
-		};
-
-		try {
-			const resp = await fetch("http://localhost:4000/api/user/login", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data),
-			});
-
-			const d = await resp.json();
-			setToken(d.data.token);
-			console.log(d);
-		} catch (error) {
-			console.log(error);
-		}
-	};
 
 	const handleAdd = async () => {
 		const data = {
@@ -107,9 +66,9 @@ const EventList = ({location}) => {
 			});
 
 			const d = await resp.json();
-			const newTodos = todos;
+			const newTodos = events;
 			newTodos.push(data);
-			setTodos([...newTodos]);
+			setEvents([...newTodos]);
 			console.log(d);
 		} catch (error) {
 			console.log(error);
@@ -117,10 +76,10 @@ const EventList = ({location}) => {
 	};
 
 	const handleDelete = async (index) => {
-		const deletedTodo = todos[index];
-		const newTodo = todos;
+		const deletedTodo = events[index];
+		const newTodo = events;
 		newTodo.splice(index, 1);
-		setTodos([...newTodo]);
+		setEvents([...newTodo]);
 
 		try {
 			fetch(`http://localhost:4000/api/event/${deletedTodo["_id"]}`, {
@@ -137,12 +96,13 @@ const EventList = ({location}) => {
 
 	const handleUpdate = async (index) => {
 		const data = {
-			from: newItem["from"],
-			to: newItem["to"],
-			content: newItem["content"],
-			creator: "61bcf2c58a7ce55630cbc172",
+			from: events[index]["from"],
+			to: events[index]["to"],
+			content: events[index]["content"],
+			creator: userId,
 		};
-		const updatedTodo = todos[index];
+		console.log(data);
+		const updatedTodo = events[index];
 		try {
 			fetch(`http://localhost:4000/api/event/${updatedTodo["_id"]}`, {
 				method: "PUT",
@@ -160,10 +120,8 @@ const EventList = ({location}) => {
 
 	return (
 		<div>
-			<button onClick={() => handleSignUp()}>Sign Up</button>
-			<button onClick={() => handleSignIn()}>Login</button>
-			<button onClick={() => setNewEvent(!newEvent)}>Add Event</button>
-			{newEvent ? (
+			<button onClick={() => setEditNewEvent(!editNewEvent)}>Add Event</button>
+			{editNewEvent ? (
 				<ul>
 					<li>
 						<div style={{ display: "inline" }}>
@@ -185,11 +143,11 @@ const EventList = ({location}) => {
 				</ul>
 			) : null}
 			<ul>
-				{todos.map((todo, index) => (
+				{events.map((item, index) => (
 					<li key={index}>
 						{canEdit ? (
 							<div style={{ display: "inline" }}>
-								{todo.from} {todo.to} {todo.content} {todo.isCompleted}
+								{item.from} {item.to} {item.content} {item.isCompleted}
 								<button onClick={changeAction}>Edit</button>
 							</div>
 						) : (
@@ -197,22 +155,22 @@ const EventList = ({location}) => {
 								<input
 									onChange={(event) => changeInput(index, "from", event)}
 									type="text"
-									value={todo.from}
+									value={item.from}
 								/>
 								<input
 									onChange={(event) => changeInput(index, "to", event)}
 									type="text"
-									value={todo.to}
+									value={item.to}
 								/>
 								<input
 									onChange={(event) => changeInput(index, "content", event)}
 									type="text"
-									value={todo.content}
+									value={item.content}
 								/>
 								<input
 									onChange={(event) => changeInput(index, "isCompleted", event)}
 									type="text"
-									value={todo.isCompleted}
+									value={item.isCompleted}
 								/>
 								<button onClick={() => handleUpdate(index)}>Save</button>
 								<button onClick={() => handleDelete(index)}>Delete</button>
