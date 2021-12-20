@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 
-const TodoList = () => {
+const EventList = ({location}) => {
 	useEffect(() => {
+		const userToken = localStorage.getItem(location.state.username);
+		setToken(userToken);
 		const getEvents = async () => {
 			const resp = await fetch("http://localhost:4000/api/event", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImplcnJ5IiwidXNlcklkIjoiNjFiY2YyYzU4YTdjZTU1NjMwY2JjMTcyIiwicm9sZSI6WyJ1c2VyIiwiYWRtaW4iXSwiaWF0IjoxNjM5Nzg0NTE3LCJleHAiOjE2Mzk3ODgxMTd9.3AkXsJuHrzNRsz_ywwzoBe3FcAwJJr5x23xTbHkviLM`,
+					Authorization: `Bearer ${userToken}`,
 				},
 			});
 			const d = await resp.json();
@@ -223,4 +225,4 @@ const TodoList = () => {
 	);
 };
 
-export default TodoList;
+export default EventList;
