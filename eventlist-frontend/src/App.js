@@ -1,6 +1,6 @@
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
-import EventList from "./components/EventList";
+import Eventlist from "./components/Eventlist";
 import SignUp from "./components/SignUp";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
@@ -12,10 +12,8 @@ function App() {
 				<Switch>
 					<Route exact path="/" component={SignUp} />
 					<Route path="/login" component={Login} />
-					<Route path="/events" component={EventList} />
+					<Route path="/events" component={Eventlist} />
 				</Switch>
-				{/* <Login />
-				<SignUp /> */}
 			</div>
 		</Router>
 	);
